@@ -1,20 +1,19 @@
-@Grab(group='org.codehaus.groovy.modules.http-builder', module='http-builder', version='0.7.1')
-import groovyx.net.http.RESTClient
+import groovy.json.JsonSlurper
 
-def todosApiUrl = 'http://jsonplaceholder.typicode.com/todos'
-def usersApiUrl = 'http://jsonplaceholder.typicode.com/users'
+def todosUrl = 'http://jsonplaceholder.typicode.com/todos'
+def usersUrl = 'http://jsonplaceholder.typicode.com/users'
 
-// Create REST clients
-def todosClient = new RESTClient(todosApiUrl)
-def usersClient = new RESTClient(usersApiUrl)
+// Fetch data from the API
+def fetchJson(url) {
+    def connection = new URL(url).openConnection()
+    connection.setRequestMethod('GET')
+    connection.connect()
+    new JsonSlurper().parse(connection.inputStream)
+}
 
-// Fetch todos
-def todosResponse = todosClient.get([:])
-def todos = todosResponse.data
-
-// Fetch users
-def usersResponse = usersClient.get([:])
-def users = usersResponse.data
+// Fetch todos and users
+def todos = fetchJson(todosUrl)
+def users = fetchJson(usersUrl)
 
 // Create a map to hold user data (total todos, completed todos)
 def userData = [:].withDefault { [total: 0, completed: 0] }
